@@ -1,5 +1,4 @@
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,37 +21,32 @@ import org.apache.catalina.ContainerServlet;
 public class InfoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		String name = request.getParameter("name");
-		String email = request.getParameter("password");
-		
-		try (BufferedWriter buff = new BufferedWriter(new FileWriter("infoUsers.txt", true))) {
-			
-			try(FileReader fr = new FileReader("infoUsers.txt"); BufferedReader br = new BufferedReader(fr)) {
-				StringBuffer sb = new StringBuffer();
-				
-				String line;
-				while((line = br.readLine())!= null) {
-					sb.append(line);
-				}
-				if(sb.append(line).equals(name + " " + email)) {
-					response.getWriter().write("Sorry this login is empty");
-				} else {
+		String password = request.getParameter("password");
+
+		try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+			String line = null;
+			String st = null;
+			while ((line = br.readLine()) != null) {
+				st = line;
+			}
+			if (st.contains(name)) {
+				response.getWriter().write("Sorry this name is not available");
+			} else {
+				try (BufferedWriter bw = new BufferedWriter(new FileWriter("users.txt", true))) {
+					bw.write(name + " " + password + "|");
 					response.getWriter().write("Thank you!");
-					for (int i = 0; i < 1 ; i++) {
-						buff.newLine();
-						buff.write("Login: " + name + " - " + "Password: " + email + "\n");
-					}
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-				
-			} 			
-			
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-								
-		
+
 	}
 
 }
